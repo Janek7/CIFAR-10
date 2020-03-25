@@ -1,5 +1,18 @@
 import configparser
+import csv
 import pickle
+
+
+def get_label_dict():
+    """
+    returns a dictionary of labels and their numeric values which are used internally
+    :return: dict of labels
+    """
+    config = get_config()
+    with open(config['image_paths']['train_labels'], newline='') as csv_file:
+        reader = csv.DictReader(csv_file, delimiter=',')
+        labels = [row['label'] for row in reader]
+        return {label: idx for idx, label in enumerate(sorted(list(set(labels))))}
 
 
 def get_config():
