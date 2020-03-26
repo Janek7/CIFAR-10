@@ -4,7 +4,7 @@ from os.path import isfile, join
 import numpy as np
 from PIL import Image
 
-from utils import get_config, save_as_pickle, load_pickle, get_label_dict
+from utils import get_config, save_as_pickle, load_pickle
 
 
 def transform_images(dir_path):
@@ -18,14 +18,29 @@ def transform_images(dir_path):
     return np.asarray([np.asarray(Image.open(image_path), dtype='int32') for image_path in image_paths])
 
 
+def get_label_dict():
+    """
+    returns a dictionary of labels and their numeric values which are used internally
+    :return: dict of labels
+    """
+    config = get_config()
+    with open(config['image_paths']['train_labels'], newline='') as csv_file:
+        reader = csv.DictReader(csv_file, delimiter=',')
+        labels = [row['label'] for row in reader]
+        return {label: idx for idx, label in enumerate(sorted(list(set(labels))))}
+
+
 def load_train_labels():
+    """
+    loads the train labels as a numpy array
+    :return:
+    """
     config = get_config()
     with open(config['image_paths']['train_labels'], newline='') as csv_file:
         reader = csv.DictReader(csv_file, delimiter=',',)
         labels = np.asarray([row['label'] for row in reader])
         label_dict = get_label_dict()
-        labels = np.asarray([label_dict[label_string] for label_string in labels])
-        return labels
+        return np.asarray([label_dict[label_string] for label_string in labels])
 
 
 if __name__ == '__main__':
